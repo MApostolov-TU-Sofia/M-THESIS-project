@@ -39,7 +39,7 @@ google_auth = google_oauth.register(
 
 from application import model
 
-import application.controller.home
+from application.controller import home
 # import app09.application.controller.role
 # import app09.application.controller.user
 # import app09.application.controller.bank
@@ -55,7 +55,7 @@ import application.controller.home
 # import app09.application.routes.transaction
 
 
-from .routes import home, user
+from .routes import home, user, data
 
 with app.app_context():
     db.create_all()

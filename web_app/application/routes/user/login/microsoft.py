@@ -8,6 +8,7 @@ from application import app, ms_auth
 
 route_user_microsoft_bp = Blueprint('route_microsoft', __name__)
 
+
 @route_user_microsoft_bp.route('/microsoft')
 @ms_auth.login_required
 def route_user_microsoft_login_index(context):

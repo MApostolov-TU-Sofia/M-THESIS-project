@@ -1,5 +1,23 @@
 {% extends "layout.html" %}
 {% block page_title %}Home{% endblock %}
 {% block content %}
-  <h1>Welcome to the Home Page</h1>
+    <h3>Upload Excel File (.xlsx)</h3>
+    <form action="/data/upload_excel" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file"
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv">
+        <input type="submit" value="Upload">
+    </form>
+    <div class="mt-4" name="load_data_table" style="overflow: auto;">
+    </div>
+
+    {% if session.get('uploaded_file_data') %}
+        <script>
+            document.querySelector('[name="load_data_table"]').innerHTML = `{{ session['uploaded_file_data'] }}`
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&#34;/g, '"');
+            document.querySelector('[name="load_data_table"] table').classList.add('table');
+            document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
+        </script>
+    {% endif %}
 {% endblock %}
