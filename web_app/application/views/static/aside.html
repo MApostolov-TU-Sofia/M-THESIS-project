@@ -1,0 +1,54 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item">
+      <a class="nav-link" href="/">
+        <i class="icon-grid menu-icon"></i>
+        <span class="menu-title">Home</span>
+      </a>
+    </li>
+    {% if session.get('user') %}
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <i class="icon-layout menu-icon"></i>
+        <span class="menu-title">My Projects</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="ui-basic">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="/">Project 1</a></li>
+          <li class="nav-item"> <a class="nav-link" href="/">Project 2</a></li>
+        </ul>
+      </div>
+    </li>
+    {% endif %}
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+        <i class="icon-head menu-icon"></i>
+        {% if session.get('user') %}
+        <span class="menu-title">Account</span>
+        {% else %}
+        <span class="menu-title">User</span>
+        {% endif %}
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="auth">
+        <ul class="nav flex-column sub-menu">
+          {% if session.get('user') %}
+          <li class="nav-item"> <a class="nav-link" href="{{ view_profile }}"> Profile </a></li>
+          <li class="nav-item"> <a class="nav-link" href="{{ logout }}"> Logout </a></li>
+          {% else %}
+          <li class="nav-item"> <a class="nav-link" href="{{ register_account }}"> Register </a></li>
+          <li class="nav-item"> <a class="nav-link" href="{{ login_microsoft }}"> Login with Microsoft </a></li>
+          <li class="nav-item"> <a class="nav-link" href="{{ login_google }}"> Login with Google </a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/">
+        <i class="icon-paper menu-icon"></i>
+        <span class="menu-title">Documentation</span>
+      </a>
+    </li>
+  </ul>
+</nav>

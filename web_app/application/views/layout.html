@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block page_title %}{% endblock %}</title>
+
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='/vendors/feather/feather.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='/vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='/vendors/css/vendor.bundle.base.css')}}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{url_for('static', filename='/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='/vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='/js/select.dataTables.min.css')}}">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='/css/vertical-layout-light/style.css')}}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{{url_for('static', filename='/images/favicon.png')}}" />
+
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+    <div class="container-scroller">
+      {% include '/static/nav.html' %}
+
+      <div class="container-fluid page-body-wrapper">
+        {% include '/static/modify-skins.html' %}
+
+        {% include '/static/aside.html' %}
+
+        <div class="main-panel">
+          <div class="content-wrapper">
+            {% block body %}
+
+            <main role="main">
+              {% block content %}{% endblock %}
+            </main>
+
+            <!-- plugins:js -->
+            <script src="{{url_for('static', filename='/vendors/js/vendor.bundle.base.js')}}"></script>
+            <!-- endinject -->
+            <!-- Plugin js for this page -->
+            <script src="{{url_for('static', filename='/vendors/chart.js/Chart.min.js')}}"></script>
+            <script src="{{url_for('static', filename='/vendors/datatables.net/jquery.dataTables.js')}}"></script>
+            <script src="{{url_for('static', filename='/vendors/datatables.net-bs4/dataTables.bootstrap4.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/dataTables.select.min.js')}}"></script>
+
+            <!-- End plugin js for this page -->
+            <!-- inject:js -->
+            <script src="{{url_for('static', filename='/js/off-canvas.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/hoverable-collapse.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/template.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/settings.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/todolist.js')}}"></script>
+            <!-- endinject -->
+            <!-- Custom js for this page-->
+            <script src="{{url_for('static', filename='/js/dashboard.js')}}"></script>
+            <script src="{{url_for('static', filename='/js/Chart.roundedBarCharts.js')}}"></script>
+            <!-- End custom js for this page-->
+
+            {% block js %}{% endblock %}
+
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
