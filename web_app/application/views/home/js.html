@@ -50,8 +50,10 @@
         const privacyModelColumn = cModel.querySelector('[name="privacy_model_column"]').innerText;
         const privacyModelType = cModel.querySelector('[name="privacy_model_type"]').value;
         const privacyModel = cModel.querySelector('[name="privacy_model_selected"]').value;
-        const privacyModelValue = cModel.querySelector('[name="privacy_model_value"]').value;
-        if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue) {
+        const privacyModelValue = cModel.querySelector('[name="privacy_model_value"]');
+        if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue.value && 
+                (Number(privacyModelValue.value) >= Number(privacyModelValue.getAttribute('min')) && 
+                (privacyModelValue.getAttribute('max') ? Number(privacyModelValue.value) <= Number(privacyModelValue.getAttribute('max')) : true))) {
             Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
                 .filter(obj => obj.children[0].innerText == privacyModelColumn &&
                     obj.children[2].innerText == cModel.querySelector('[name="privacy_model_selected"]').value)
@@ -60,7 +62,7 @@
     <td>${privacyModelColumn}</td>
     <td>${privacyModelType}</td>
     <td>${privacyModel}</td>
-    <td>${privacyModelValue}</td>
+    <td>${privacyModelValue.value}</td>
     <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
     </tr>`;
             const TblTrs = Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
@@ -88,7 +90,9 @@
     el.value == 'TCloseness' ? 'between 0.000001 to 1.0' : ''}</span>
 </div>
 <div class="col-6">
-<input type="number" name="privacy_model_value" class="form-control form-control-sm" />
+<input type="number" name="privacy_model_value" class="form-control form-control-sm" ${el.value == 'KAnonymity' ? 'min="2"' :
+    el.value == 'LDiversity' ? 'min="2"' :
+    el.value == 'TCloseness' ? 'min="0.000001" max="1.0"' : ''} />
 </div>` : '';
         document.querySelector('[name="select_anonymous_button"]').innerHTML = el.value ?
             '<button class="btn btn-warning btn-sm btn-block" onclick="savePrivacyModel(this);">SAVE</button>' : '';
