@@ -1,0 +1,125 @@
+<script>
+    const selectedColumnBgColor = '#eeeeee';
+    let selectedColumn;
+    const resetModelSelectHTML = () => {
+        return `<div class="row">
+    <div class="col-6"><label>Column Name</label></div>
+    <div class="col-6" name="privacy_model_column">${selectedColumn.innerText}</div>
+</div>
+<div class="row mt-2">
+    <div class="col-6"><label>Column Type</label></div>    
+    <div class="col-6">
+        <select name="privacy_model_type" class="js-example-basic-single w-100" onchange="selectedColumnType(this);">
+            <option value=""></option>
+            <option value="string">Text / String</option>
+            <option value="number">Number</option>
+            <option value="date">Date</option>
+        </select>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-6"><label>Privacy Model</label></div>
+    <div class="col-6">
+        <select name="privacy_model_selected" class="js-example-basic-single w-100" onchange="selectedPrivacyModel(this);">
+            <option value=""></option>
+            <option value="KAnonymity">K-Anonymity</option>
+            <option value="LDiversity">L-Diversity</option>
+            <option value="TCloseness">T-Closeness</option>
+        </select>
+    </div>
+</div>
+<div class="row mt-2" name="select_anonymous_value"></div>
+<div class="row mt-2" name="select_anonymous_button"></div>`;
+    };
+    let cTableJSON = JSON.parse(`{{ session['uploaded_file_data_json'] }}`
+        .replace(/&#34;/g, '"')
+        .replace(/NaN/g, '')
+        .replace(/\n/g, ' '));
+    document.querySelector('[name="load_data_table"]').innerHTML = `{{ session['uploaded_file_data_html'] }}`
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#34;/g, '"')
+        .replace(/NaN/g, '')
+        .replace(/\n/g, ' ');
+    document.querySelector('[name="load_data_table"] table').classList.add('table');
+    document.querySelector('[name="load_data_table"] table').classList.add('table-sm');
+    document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
+
+    const savePrivacyModel = (el) => {
+        const cModel = el.parentElement.parentElement;
+        const privacyModelColumn = cModel.querySelector('[name="privacy_model_column"]').innerText;
+        const privacyModelType = cModel.querySelector('[name="privacy_model_type"]').value;
+        const privacyModel = cModel.querySelector('[name="privacy_model_selected"]').value;
+        const privacyModelValue = cModel.querySelector('[name="privacy_model_value"]').value;
+        if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue) {
+            Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
+                .filter(obj => obj.children[0].innerText == privacyModelColumn &&
+                    obj.children[2].innerText == cModel.querySelector('[name="privacy_model_selected"]').value)
+                .forEach(obj => obj.remove());
+            document.querySelector('table[name="data_transformation_details"] tbody').innerHTML += `<tr>
+    <td>${privacyModelColumn}</td>
+    <td>${privacyModelType}</td>
+    <td>${privacyModel}</td>
+    <td>${privacyModelValue}</td>
+    <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
+    </tr>`;
+            const TblTrs = Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
+                .sort((a, b) => a.innerHTML.localeCompare(b.innerHTML))
+                .map(obj => `<tr>${obj.innerHTML}</tr>`)
+                .join('');
+            document.querySelector('table[name="data_transformation_details"] tbody').innerHTML = TblTrs;
+        } else {
+            alert('Not all fields are filled!');
+        }
+    };
+
+    const selectedColumnType = (el) => {
+        if (!el.value) {
+            const cModel = el.parentElement.parentElement.parentElement;
+            cModel.innerHTML = resetModelSelectHTML();
+        }
+    };
+
+    const selectedPrivacyModel = (el) => {
+        document.querySelector('[name="select_anonymous_value"]').innerHTML = el.value ? `<div class="col-6">
+<label>${el.value} value</label><br/>
+<span class="text-danger">must be ${el.value == 'KAnonymity' ? '2 or higher' :
+    el.value == 'LDiversity' ? '2 or higher' :
+    el.value == 'TCloseness' ? 'between 0.000001 to 1.0' : ''}</span>
+</div>
+<div class="col-6">
+<input type="number" name="privacy_model_value" class="form-control form-control-sm" />
+</div>` : '';
+        document.querySelector('[name="select_anonymous_button"]').innerHTML = el.value ?
+            '<button class="btn btn-warning btn-sm btn-block" onclick="savePrivacyModel(this);">SAVE</button>' : '';
+    };
+
+    Array.from(document.querySelectorAll('[name="load_data_table"] table thead th'))
+        .forEach((obj, ind, arr) => {
+            if (ind > 0) {
+                obj.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    Array.from(document.querySelectorAll(`[name="load_data_table"] table thead tr th`))
+                        .filter(obj => obj.hasAttribute('style'))
+                        .forEach((obj, ind, arr) => {
+                            obj.style = '';
+                        });
+                    Array.from(document.querySelectorAll(`[name="load_data_table"] table tbody tr td`))
+                        .filter(obj => obj.hasAttribute('style'))
+                        .forEach((obj, ind, arr) => {
+                            obj.style = '';
+                        });
+
+                    e.target.style = `background-color: ${selectedColumnBgColor};`;
+
+                    Array.from(document.querySelectorAll('[name="load_data_table"] table tbody tr'))
+                        .forEach((iObj, iInd, iArr) => {
+                            iObj.children[ind].style = `background-color: ${selectedColumnBgColor};`;
+                        });
+
+                    selectedColumn = e.target;
+                    document.querySelector('[name="load_data_transformation"]').innerHTML = resetModelSelectHTML();
+                });
+            }
+        });
+</script>

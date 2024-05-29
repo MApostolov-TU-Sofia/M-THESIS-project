@@ -1,23 +1,71 @@
 {% extends "layout.html" %}
 {% block page_title %}Home{% endblock %}
 {% block content %}
-    <h3>Upload Excel File (.xlsx)</h3>
-    <form action="/data/upload_excel" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file"
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv">
-        <input type="submit" value="Upload">
-    </form>
-    <div class="mt-4" name="load_data_table" style="overflow: auto;">
+    <div class="row mt-4">
+        <button class="btn btn-info btn-sm btn-block">Anonymize</button>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <label>Upload document</label>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Upload Excel File (.xlsx/.xls)</h3>
+                </div>
+                <div class="col-12">
+                    <form action="/data/upload_excel" method="POST" enctype="multipart/form-data" class="row">
+                        <div class="col-10">
+                            <input type="file" name="file" class="file-upload-default w-100 border"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <!-- , .csv -->
+                        </div>
+                        <div class="col-2">
+                            <input type="submit" class="btn btn-warning btn-sm btn-block" value="Upload">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-6 text-center">
+            <label>Input Information</label>
+            <div name="load_data_table" class="text-left" style="overflow: auto;">
+            </div>
+        </div>
+        <div class="col-6 text-center">
+            <div class="row">
+                <div class="col-12">
+                    <label>Data Transformation</label>
+                    <div name="load_data_transformation">
+                    </div>
+                </div>
+                <div class="col-12 mt-2">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <label>Data Transformation Details</label>
+                            <table class="table table-sm table-hover" name="data_transformation_details">
+                                <thead>
+                                    <tr>
+                                        <th>Column Name</th>
+                                        <th>Column Type</th>
+                                        <th>Privacy Model</th>
+                                        <th>Value</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% if session.get('uploaded_file_data') %}
-        <script>
-            document.querySelector('[name="load_data_table"]').innerHTML = `{{ session['uploaded_file_data'] }}`
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&#34;/g, '"');
-            document.querySelector('[name="load_data_table"] table').classList.add('table');
-            document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
-        </script>
+        {% include '/home/js.html' %}
     {% endif %}
 {% endblock %}
