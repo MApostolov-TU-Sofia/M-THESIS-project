@@ -18,6 +18,18 @@
     </div>
 </div>
 <div class="row mt-2">
+    <div class="col-6"><label>Transformation Type</label></div>    
+    <div class="col-6">
+        <select name="privacy_model_transformation_type" class="js-example-basic-single w-100">
+            <option value=""></option>
+            <option value="identifying">Identifying</option>
+            <option value="quasi_identifying">Quasi-identifying</option>
+            <option value="sensitive">Sensitive</option>
+            <option value="insensitive">Insensitive</option>
+        </select>
+    </div>
+</div>
+<div class="row mt-2">
     <div class="col-6"><label>Privacy Model</label></div>
     <div class="col-6">
         <select name="privacy_model_selected" class="js-example-basic-single w-100" onchange="selectedPrivacyModel(this);">
@@ -49,18 +61,22 @@
         const cModel = el.parentElement.parentElement;
         const privacyModelColumn = cModel.querySelector('[name="privacy_model_column"]').innerText;
         const privacyModelType = cModel.querySelector('[name="privacy_model_type"]').value;
+        const privacyModelTransformationType = cModel.querySelector('[name="privacy_model_transformation_type"]').value;
         const privacyModel = cModel.querySelector('[name="privacy_model_selected"]').value;
         const privacyModelValue = cModel.querySelector('[name="privacy_model_value"]');
-        if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue.value && 
+        if (privacyModelColumn && privacyModelType && privacyModelTransformationType && 
+                privacyModel && privacyModelValue.value && 
                 (Number(privacyModelValue.value) >= Number(privacyModelValue.getAttribute('min')) && 
                 (privacyModelValue.getAttribute('max') ? Number(privacyModelValue.value) <= Number(privacyModelValue.getAttribute('max')) : true))) {
             Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
                 .filter(obj => obj.children[0].innerText == privacyModelColumn &&
-                    obj.children[2].innerText == cModel.querySelector('[name="privacy_model_selected"]').value)
+                    obj.children[2].innerText == cModel.querySelector('[name="privacy_model_transformation_type"]').value &&
+                    obj.children[3].innerText == cModel.querySelector('[name="privacy_model_selected"]').value)
                 .forEach(obj => obj.remove());
             document.querySelector('table[name="data_transformation_details"] tbody').innerHTML += `<tr>
     <td>${privacyModelColumn}</td>
     <td>${privacyModelType}</td>
+    <td>${privacyModelTransformationType}</td>
     <td>${privacyModel}</td>
     <td>${privacyModelValue.value}</td>
     <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
@@ -126,4 +142,36 @@
                 });
             }
         });
+
+    const tableToJson = (table) => {
+        let data = [];
+        for (let i = 1; i < table.rows.length; i++) {
+            const tableRow = table.rows[i];
+            let rowData = {};
+            for (let j = 0; j < tableRow.cells.length - 1; j++) {
+                rowData[`${table.rows[0].cells[j].innerHTML.replace(/ /g, '_')}`] = tableRow.cells[j].innerHTML;
+            }
+            data.push(rowData);
+        }
+        return data;
+    };
+
+    const anonymizeData = () => {
+        const columnsData = {
+            'columns': tableToJson(document.querySelector('table[name="data_transformation_details"]'))
+        }
+        fetch('/data/anonymize_data', {
+            method: "POST",
+            body: JSON.stringify(columnsData),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((json) => {
+            console.log(json)
+        });
+    };
 </script>
