@@ -52,6 +52,7 @@
         .replace(/&gt;/g, '>')
         .replace(/&#34;/g, '"')
         .replace(/NaN/g, '')
+        .replace(/0/g, '')
         .replace(/\n/g, ' ');
     document.querySelector('[name="load_data_table"] table').classList.add('table');
     document.querySelector('[name="load_data_table"] table').classList.add('table-sm');
