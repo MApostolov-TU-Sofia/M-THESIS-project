@@ -1,48 +1,21 @@
 <script>
     const selectedColumnBgColor = '#eeeeee';
-    let selectedColumn;
-    const resetModelSelectHTML = () => {
-        return `<div class="row">
-    <div class="col-6"><label>Column Name</label></div>
-    <div class="col-6" name="privacy_model_column">${selectedColumn.innerText}</div>
-</div>
-<div class="row mt-2">
-    <div class="col-6"><label>Column Type</label></div>    
-    <div class="col-6">
-        <select name="privacy_model_type" class="js-example-basic-single w-100" onchange="selectedColumnType(this);">
-            <option value=""></option>
-            <option value="string">Text / String</option>
-            <option value="number">Number</option>
-            <option value="date">Date</option>
-        </select>
-    </div>
-</div>
-<div class="row mt-2">
-    <div class="col-6"><label>Transformation Type</label></div>    
-    <div class="col-6">
-        <select name="privacy_model_transformation_type" class="js-example-basic-single w-100">
-            <option value=""></option>
-            <option value="identifying">Identifying</option>
-            <option value="quasi_identifying">Quasi-identifying</option>
-            <option value="sensitive">Sensitive</option>
-            <option value="insensitive">Insensitive</option>
-        </select>
-    </div>
-</div>
-<div class="row mt-2">
-    <div class="col-6"><label>Privacy Model</label></div>
-    <div class="col-6">
-        <select name="privacy_model_selected" class="js-example-basic-single w-100" onchange="selectedPrivacyModel(this);">
-            <option value=""></option>
-            <option value="KAnonymity">K-Anonymity</option>
-            <option value="LDiversity">L-Diversity</option>
-            <option value="TCloseness">T-Closeness</option>
-        </select>
-    </div>
-</div>
-<div class="row mt-2" name="select_anonymous_value"></div>
-<div class="row mt-2" name="select_anonymous_button"></div>`;
+
+    const selectHierarchy = (el) => {
+        const helpText = el.value == 'interval' ? 'Example: |0-15?new|16-50?standard|51-100?high|' :
+            el.value == 'date' ? `Info: a -> NOT CHANGED<br/>      s -> SECOND_MINUTE_HOUR_DAY_MONTH_YEAR<br/>      m -> MINUTE_HOUR_DAY_MONTH_YEAR<br/>      y -> YEAR<br/>
+            Example: a, s, m, y` :
+            el.value == 'redaction' ? 'Example: * . |' : '';
+        document.querySelector('[name="hierarchy_help"]').innerHTML = helpText;
     };
+
+    const showCollapsedElement = (el) => {
+        if (document.querySelector('[name="collapse_elements"] .collapse.show')) {
+            document.querySelector('[name="collapse_elements"] .collapse.show').classList.remove('show');
+        }
+        document.querySelector(`[name="collapse_elements"] .collapse${el.getAttribute('attr-id')}`).classList.add('show');
+    };
+
     let cTableJSON = JSON.parse(`{{ session['uploaded_file_data_json'] }}`
         .replace(/&#34;/g, '"')
         .replace(/NaN/g, '')
@@ -59,44 +32,64 @@
     document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
 
     const savePrivacyModel = (el) => {
-        const cModel = el.parentElement.parentElement;
-        const privacyModelColumn = cModel.querySelector('[name="privacy_model_column"]').innerText;
-        const privacyModelType = cModel.querySelector('[name="privacy_model_type"]').value;
-        const privacyModelTransformationType = cModel.querySelector('[name="privacy_model_transformation_type"]').value;
-        const privacyModel = cModel.querySelector('[name="privacy_model_selected"]').value;
+        const cModel = el.parentElement.parentElement.parentElement;
+        const privacyModelColumn = document.querySelector('[name="privacy_model_column"]') ?
+            document.querySelector('[name="privacy_model_column"]').innerText : null;
+        const privacyModelType = document.querySelector('[name="privacy_model_type"]') ?
+            document.querySelector('[name="privacy_model_type"]').value : null;
+        const privacyModelTransformationType = cModel.querySelector('[name="privacy_model_transformation_type"]') ?
+            cModel.querySelector('[name="privacy_model_transformation_type"]').value : null;
+        const privacyModelHierarchyType = cModel.querySelector('[name="privacy_model_hierarchy_type"]') ?
+            cModel.querySelector('[name="privacy_model_hierarchy_type"]').value : null;
+        const privacyModelHierarchySymbols = cModel.querySelector('[name="privacy_model_hierarchy_symbols"]') ?
+            cModel.querySelector('[name="privacy_model_hierarchy_symbols"]').value : null;
+        const privacyModel = cModel.querySelector('[name="privacy_model_selected"]') ?
+            cModel.querySelector('[name="privacy_model_selected"]').value : null;
         const privacyModelValue = cModel.querySelector('[name="privacy_model_value"]');
-        if (privacyModelColumn && privacyModelType && privacyModelTransformationType && 
-                privacyModel && privacyModelValue.value && 
-                (Number(privacyModelValue.value) >= Number(privacyModelValue.getAttribute('min')) && 
-                (privacyModelValue.getAttribute('max') ? Number(privacyModelValue.value) <= Number(privacyModelValue.getAttribute('max')) : true))) {
-            Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
-                .filter(obj => obj.children[0].innerText == privacyModelColumn &&
-                    obj.children[2].innerText == cModel.querySelector('[name="privacy_model_transformation_type"]').value &&
-                    obj.children[3].innerText == cModel.querySelector('[name="privacy_model_selected"]').value)
-                .forEach(obj => obj.remove());
-            document.querySelector('table[name="data_transformation_details"] tbody').innerHTML += `<tr>
+
+        let iHTML = ''
+        if (el.getAttribute('attr-id') == 'data_transformation') {            
+            if (privacyModelColumn && privacyModelType && privacyModelTransformationType) {
+                Array.from(cModel.querySelectorAll('table tbody tr'))
+                    .filter(obj => obj.children[0].innerText == privacyModelColumn)
+                    .forEach(obj => obj.remove());
+                iHTML = `<tr>
     <td>${privacyModelColumn}</td>
     <td>${privacyModelType}</td>
     <td>${privacyModelTransformationType}</td>
+    <td>${privacyModelHierarchyType}</td>
+    <td>${privacyModelHierarchySymbols}</td>
+    <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
+</tr>`;
+            } else {
+                alert('Not all fields are filled!');
+            }
+        } else if (el.getAttribute('attr-id') == 'privacy_model') {
+            if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue.value && 
+                    (Number(privacyModelValue.value) >= Number(privacyModelValue.getAttribute('min')) && 
+                    (privacyModelValue.getAttribute('max') ? Number(privacyModelValue.value) <= Number(privacyModelValue.getAttribute('max')) : true))) {
+                Array.from(cModel.querySelectorAll('table tbody tr'))
+                    .filter(obj => obj.children[0].innerText == privacyModelColumn &&
+                        obj.children[2].innerText == privacyModel)
+                    .forEach(obj => obj.remove());
+                iHTML = `<tr>
+    <td>${privacyModelColumn}</td>
+    <td>${privacyModelType}</td>
     <td>${privacyModel}</td>
     <td>${privacyModelValue.value}</td>
     <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
-    </tr>`;
-            const TblTrs = Array.from(document.querySelectorAll('table[name="data_transformation_details"] tbody tr'))
-                .sort((a, b) => a.innerHTML.localeCompare(b.innerHTML))
-                .map(obj => `<tr>${obj.innerHTML}</tr>`)
-                .join('');
-            document.querySelector('table[name="data_transformation_details"] tbody').innerHTML = TblTrs;
-        } else {
-            alert('Not all fields are filled!');
+</tr>`;
+            } else {
+                alert('Not all fields are filled!');
+            }
         }
-    };
+        cModel.querySelector('table tbody').innerHTML += iHTML;
 
-    const selectedColumnType = (el) => {
-        if (!el.value) {
-            const cModel = el.parentElement.parentElement.parentElement;
-            cModel.innerHTML = resetModelSelectHTML();
-        }
+        const TblTrs = Array.from(cModel.querySelectorAll('table tbody tr'))
+            .sort((a, b) => a.innerHTML.localeCompare(b.innerHTML))
+            .map(obj => `<tr>${obj.innerHTML}</tr>`)
+            .join('');
+        cModel.querySelector('table tbody').innerHTML = TblTrs;
     };
 
     const selectedPrivacyModel = (el) => {
@@ -138,8 +131,7 @@
                             iObj.children[ind].style = `background-color: ${selectedColumnBgColor};`;
                         });
 
-                    selectedColumn = e.target;
-                    document.querySelector('[name="load_data_transformation"]').innerHTML = resetModelSelectHTML();
+                    document.querySelector('[name="privacy_model_column"]').innerText = e.target.innerText;
                 });
             }
         });
@@ -159,7 +151,8 @@
 
     const anonymizeData = () => {
         const columnsData = {
-            'columns': tableToJson(document.querySelector('table[name="data_transformation_details"]'))
+            'data_transformation': tableToJson(document.querySelector('table[name="data_transformation_details"]')),
+            'privacy_model': tableToJson(document.querySelector('table[name="privacy_model_details"]')),
         }
         fetch('/data/anonymize_data', {
             method: "POST",
