@@ -32,17 +32,6 @@
     document.querySelector('[name="load_data_table"] table').classList.add('table-sm');
     document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
 
-    document.querySelector('[name="load_anonymized_table"]').innerHTML = `{{ session['annonymized_file_data_html'] }}`
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&#34;/g, '"')
-        .replace(/NaN/g, '')
-        .replace(/0/g, '')
-        .replace(/\n/g, ' ');
-    document.querySelector('[name="load_anonymized_table"] table').classList.add('table');
-    document.querySelector('[name="load_anonymized_table"] table').classList.add('table-sm');
-    document.querySelector('[name="load_anonymized_table"] table').classList.add('table-hover');
-
     const savePrivacyModel = (el) => {
         const cModel = el.parentElement.parentElement.parentElement;
         const privacyModelColumn = document.querySelector('[name="privacy_model_column"]') ?
@@ -74,7 +63,8 @@
     <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
 </tr>`;
             } else {
-                alert('Not all fields are filled!');
+                document.querySelector(`#fail .toast-body`).innerHTML = 'Not all fields are filled!';
+                document.querySelector(`#fail`).classList.remove('d-none');
             }
         } else if (el.getAttribute('attr-id') == 'privacy_model') {
             if (privacyModelColumn && privacyModelType && privacyModel && privacyModelValue.value && 
@@ -92,7 +82,8 @@
     <td><button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button></td>
 </tr>`;
             } else {
-                alert('Not all fields are filled!');
+                document.querySelector(`#fail .toast-body`).innerHTML = 'Not all fields are filled!';
+                document.querySelector(`#fail`).classList.remove('d-none');
             }
         }
         cModel.querySelector('table tbody').innerHTML += iHTML;
@@ -116,8 +107,6 @@
     el.value == 'LDiversity' ? 'min="2"' :
     el.value == 'TCloseness' ? 'min="0.000001" max="1.0"' : ''} />
 </div>` : '';
-        document.querySelector('[name="select_anonymous_button"]').innerHTML = el.value ?
-            '<button class="btn btn-warning btn-sm btn-block" onclick="savePrivacyModel(this);">SAVE</button>' : '';
     };
 
     Array.from(document.querySelectorAll('[name="load_data_table"] table thead th'))
@@ -161,6 +150,18 @@
         return data;
     };
 
+    const reDrawLayout = (resp) => {
+        console.log(resp);
+        document.querySelector('[name="collapse_window"] button[attr-id="#anonymized_data"]').classList.remove('disabled');
+        document.querySelector('[name="collapse_window"] button[attr-id="#anonymized_data"]').removeAttribute('disabled');
+        document.querySelector('[name="collapse_window"] button[attr-id="#analyze_risk"]').classList.remove('disabled');
+        document.querySelector('[name="collapse_window"] button[attr-id="#analyze_risk"]').removeAttribute('disabled');
+        document.querySelector('[name="load_anonymized_table"]').innerHTML = resp.anonymized_data;
+        document.querySelector('[name="load_anonymized_table"] table').classList.add('table');
+        document.querySelector('[name="load_anonymized_table"] table').classList.add('table-sm');
+        document.querySelector('[name="load_anonymized_table"] table').classList.add('table-hover');
+    };
+
     const anonymizeData = (el) => {
         const columnsData = {
             'data_transformation': tableToJson(document.querySelector('table[name="data_transformation_details"]')),
@@ -182,6 +183,9 @@
                 return response.json();
             })
             .then((json) => {
+                if (json.status == 'success') {
+                    reDrawLayout(json);
+                }
                 document.querySelector(`#${json.status} .toast-body`).innerHTML = json.message ? JSON.parse(json.message).message : json.status;
                 document.querySelector(`#${json.status}`).classList.remove('d-none');
                 el.innerHTML = bText;
@@ -194,5 +198,10 @@
             document.querySelector(`#fail .toast-body`).innerHTML = iText;
             document.querySelector(`#fail`).classList.remove('d-none');
         }
+    };
+
+    const exportAnnonymizedData = (el) => {
+        const table2excel = new Table2Excel();
+        table2excel.export(document.querySelector('[name="load_anonymized_table"] table'), 'annonymized_data');
     };
 </script>

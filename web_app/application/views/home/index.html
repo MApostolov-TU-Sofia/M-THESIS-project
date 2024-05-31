@@ -5,8 +5,8 @@
     <div class="col-12">
         <p>
             <button class="btn btn-outline-info btn-sm" attr-id="#prepare_data" onclick="showCollapsedElement(this, 'collapse_window');">Configure Transformation</button>
-            <button class="btn btn-outline-info btn-sm {% if not session.get('annonymized_file_data_html') %} disabled {% endif %}" attr-id="#anonymized_data" onclick="showCollapsedElement(this, 'collapse_window');" {% if not session.get('annonymized_file_data_html') %} disabled {% endif %}>Explore Results</button>
-            <button class="btn btn-outline-info btn-sm {% if not session.get('annonymized_file_data_html') %} disabled {% endif %}" attr-id="#analyze_risk" onclick="showCollapsedElement(this, 'collapse_window');" {% if not session.get('annonymized_file_data_html') %} disabled {% endif %}>Analyze Risk</button>
+            <button class="btn btn-outline-info btn-sm disabled" attr-id="#anonymized_data" onclick="showCollapsedElement(this, 'collapse_window');" disabled>Explore Results</button>
+            <button class="btn btn-outline-info btn-sm disabled" attr-id="#analyze_risk" onclick="showCollapsedElement(this, 'collapse_window');" disabled>Analyze Risk</button>
         </p>
     </div>
     <div class="collapse w-100 show" id="prepare_data">
@@ -173,6 +173,9 @@
     </div>
     <div class="collapse w-100" id="anonymized_data">
         <div class="card card-body" style="background-color: #F5F7FF;">
+            <div class="row mt-4">
+                <button class="btn btn-warning btn-sm btn-block" onclick="exportAnnonymizedData(this);">Export XLSX</button>
+            </div>
             <div class="row mt-4">
                 <div class="col-12 text-center">
                     <label>Anonymized data</label>

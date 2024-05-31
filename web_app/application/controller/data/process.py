@@ -85,9 +85,6 @@ def anonymize_data(args):
         # get the new dataset
         anonymized_dataset = anonymize_result.dataset
         anon_dataframe = anonymized_dataset.to_dataframe()
-        session['annonymized_file_data'] = anon_dataframe
-        session['annonymized_file_data_html'] = anon_dataframe.to_html()
-        session['annonymized_file_data_json'] = anon_dataframe.to_json(force_ascii=False)
 
         # get the risk profile for the new dataset
         anon_risk_profile = anonymize_result.risk_profile
