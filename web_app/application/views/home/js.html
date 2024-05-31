@@ -2,18 +2,19 @@
     const selectedColumnBgColor = '#eeeeee';
 
     const selectHierarchy = (el) => {
-        const helpText = el.value == 'interval' ? 'Example: |0-15?new|16-50?standard|51-100?high|' :
+        const helpText = el.value == 'interval' ? 'Example: 0,15,new|16,50,standard|51,100,high' :
             el.value == 'date' ? `Info: a -> NOT CHANGED<br/>      s -> SECOND_MINUTE_HOUR_DAY_MONTH_YEAR<br/>      m -> MINUTE_HOUR_DAY_MONTH_YEAR<br/>      y -> YEAR<br/>
             Example: a, s, m, y` :
             el.value == 'redaction' ? 'Example: * . |' : '';
         document.querySelector('[name="hierarchy_help"]').innerHTML = helpText;
     };
 
-    const showCollapsedElement = (el) => {
-        if (document.querySelector('[name="collapse_elements"] .collapse.show')) {
-            document.querySelector('[name="collapse_elements"] .collapse.show').classList.remove('show');
+    const showCollapsedElement = (el, prt_el) => {
+        if (document.querySelector(`[name="${prt_el}"] .collapse.show`)) {
+            Array.from(document.querySelectorAll(`[name="${prt_el}"] .collapse.show`))
+                .forEach(obj => obj.classList.remove('show'));
         }
-        document.querySelector(`[name="collapse_elements"] .collapse${el.getAttribute('attr-id')}`).classList.add('show');
+        document.querySelector(`[name="${prt_el}"] .collapse${el.getAttribute('attr-id')}`).classList.add('show');
     };
 
     let cTableJSON = JSON.parse(`{{ session['uploaded_file_data_json'] }}`
@@ -30,6 +31,17 @@
     document.querySelector('[name="load_data_table"] table').classList.add('table');
     document.querySelector('[name="load_data_table"] table').classList.add('table-sm');
     document.querySelector('[name="load_data_table"] table').classList.add('table-hover');
+
+    document.querySelector('[name="load_anonymized_table"]').innerHTML = `{{ session['annonymized_file_data_html'] }}`
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#34;/g, '"')
+        .replace(/NaN/g, '')
+        .replace(/0/g, '')
+        .replace(/\n/g, ' ');
+    document.querySelector('[name="load_anonymized_table"] table').classList.add('table');
+    document.querySelector('[name="load_anonymized_table"] table').classList.add('table-sm');
+    document.querySelector('[name="load_anonymized_table"] table').classList.add('table-hover');
 
     const savePrivacyModel = (el) => {
         const cModel = el.parentElement.parentElement.parentElement;
@@ -149,23 +161,38 @@
         return data;
     };
 
-    const anonymizeData = () => {
+    const anonymizeData = (el) => {
         const columnsData = {
             'data_transformation': tableToJson(document.querySelector('table[name="data_transformation_details"]')),
             'privacy_model': tableToJson(document.querySelector('table[name="privacy_model_details"]')),
         }
-        fetch('/data/anonymize_data', {
-            method: "POST",
-            body: JSON.stringify(columnsData),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8'
-            }
-        })
-        .then((response) => {
-            return response.json();
-        })
-        .then((json) => {
-            console.log(json)
-        });
+        if (columnsData.data_transformation.length > 0 && columnsData.privacy_model.length > 0) {
+            const bText = el.innerHTML;
+            el.innerHTML = `<div class="spinner-border spinner-border-sm text-light"></div>`;
+            el.classList.add('disabled');
+            el.setAttribute('disabled', '');
+            fetch('/data/anonymize_data', {
+                method: "POST",
+                body: JSON.stringify(columnsData),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                document.querySelector(`#${json.status} .toast-body`).innerHTML = json.message ? JSON.parse(json.message).message : json.status;
+                document.querySelector(`#${json.status}`).classList.remove('d-none');
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
+            });
+        } else {
+            let iText = columnsData.data_transformation.length == 0 ? 'At least one Transformation Type and Hierarchy must be specified!<br/>' : '';
+            iText += columnsData.privacy_model.length == 0 ? 'At least one privacy model must be specified!' : '';
+            document.querySelector(`#fail .toast-body`).innerHTML = iText;
+            document.querySelector(`#fail`).classList.remove('d-none');
+        }
     };
 </script>

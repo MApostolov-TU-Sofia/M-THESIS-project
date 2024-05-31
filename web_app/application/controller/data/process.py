@@ -3,7 +3,7 @@ import pandas as pd
 from flask import Flask, render_template, jsonify, request, redirect, session
 from fileinput import filename
 from pyarxaas import ARXaaS, AttributeType, Dataset
-from pyarxaas.privacy_models import KAnonymity
+from pyarxaas.privacy_models import KAnonymity, LDiversityDistinct, TClosenessEqualDistance
 from pyarxaas.hierarchy import IntervalHierarchyBuilder, OrderHierarchyBuilder, DateHierarchyBuilder, RedactionHierarchyBuilder
 from config import Config
 
@@ -36,76 +36,93 @@ def data_upload_excel():
 
 
 def anonymize_data(args):
-    data = session['uploaded_file_data']
-    dataset = Dataset.from_pandas(data)
+    try:
+        data = session['uploaded_file_data']
+        dataset = Dataset.from_pandas(data)
 
-    # get the risk profle of the dataset
-    risk_profile = arxaas.risk_profile(dataset)
-    # get risk metrics
-    na_re_indentification_risk = risk_profile.re_identification_risk
-    na_rp_attacker_success_rate = risk_profile.attacker_success_rate
-    na_distribution_of_risk = risk_profile.distribution_of_risk
+        # get the risk profle of the dataset
+        risk_profile = arxaas.risk_profile(dataset)
+        # get risk metrics
+        na_re_indentification_risk = risk_profile.re_identification_risk
+        na_rp_attacker_success_rate = risk_profile.attacker_success_rate
+        na_distribution_of_risk = risk_profile.distribution_of_risk
 
-    # intervalH = IntervalHierarchyBuilder.add_interval(IntervalHierarchyBuilder, 0, 10, '*')
-    no_config_redaction_based = RedactionHierarchyBuilder()  # Create builder
-    order_based = OrderHierarchyBuilder()
-    # set attribute type
-    # dataset.set_attribute_type(AttributeType.QUASIIDENTIFYING, 'VisitorCardNbr', 'VisitorEmail')
-    # dataset.set_attribute_type(AttributeType.IDENTIFYING, 'Invitor')
-    # redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data['VisitorCardNbr'].tolist())
-    # dataset.set_hierarchy('VisitorCardNbr', no_config_redaction_based)
-    # dataset.set_hierarchy('VisitorEmail', no_config_redaction_based)
-    # dataset.set_hierarchy('VisitorCardNbr', intervalH)
-    # dataset.set_hierarchy('VisitorEmail', intervalH)
+        for ind, dts in enumerate(args['data_transformation']):
+            c_attr = AttributeType.IDENTIFYING if (dts['Transformation_Type'] == 'identifying') else AttributeType.QUASIIDENTIFYING if (dts['Transformation_Type'] == 'quasi_identifying') else AttributeType.SENSITIVE if (dts['Transformation_Type'] == 'sensitive') else AttributeType.INSENSITIVE if (dts['Transformation_Type'] == 'insensitive') else None
+            if (c_attr is not None):
+                dataset.set_attribute_type(c_attr, dts['Column_Name'])
 
-    # dataset.set_attribute_type(AttributeType.IDENTIFYING, "Invitor")
-    dataset.set_attribute_type(AttributeType.QUASIIDENTIFYING, 'Type', 'Invitor', 'Invitor_FullName', 'VisitorName')
-    redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data['Type'].tolist())
-    dataset.set_hierarchy("Type", redaction_hierarchy)
-    redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data['Invitor'].tolist())
-    dataset.set_hierarchy("Invitor", redaction_hierarchy)
-    redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data['Invitor_FullName'].tolist())
-    dataset.set_hierarchy("Invitor_FullName", redaction_hierarchy)
-    redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data['VisitorName'].tolist())
-    dataset.set_hierarchy("VisitorName", redaction_hierarchy)
+                hierarchy_builder = RedactionHierarchyBuilder(redaction_char=dts['Hierarchy_Symbols']) if (dts['Hierarchy_Type'] == 'redaction') else IntervalHierarchyBuilder() if (dts['Hierarchy_Type'] == 'interval') else DateHierarchyBuilder() if (dts['Hierarchy_Type'] == 'date') else None
 
-    kanon = KAnonymity(2)
-    anonymize_result = arxaas.anonymize(dataset, [kanon])
+                if (dts['Hierarchy_Type'] == 'interval'):
+                    i_intervals = dts['Hierarchy_Symbols'].split('|')
+                    for i_ind, i_dts in enumerate(i_intervals):
+                        if (len(i_dts.strip()) > 0):
+                            i_dts_el = i_dts.split(',')
+                            hierarchy_builder.add_interval(int(i_dts_el.get(0)), int(i_dts_el.get(1)), i_dts_el.get(2))
+                if (hierarchy_builder is not None):
+                    redaction_hierarchy = arxaas.hierarchy(hierarchy_builder, data[dts['Column_Name']].tolist())
+                    dataset.set_hierarchy(dts['Column_Name'], redaction_hierarchy)
 
-    # get the new dataset
-    anonymized_dataset = anonymize_result.dataset
-    anon_dataframe = anonymized_dataset.to_dataframe()
-    session['annonymized_file_data'] = anon_dataframe
-    session['annonymized_file_data_html'] = anon_dataframe.to_html()
-    session['annonymized_file_data_json'] = anon_dataframe.to_json(force_ascii=False)
+        arr_anon = []
+        for ind, dts in enumerate(args['privacy_model']):
+            t_anon = KAnonymity(int(dts['Value'])) if (dts['Privacy_Model'] == 'KAnonymity') else LDiversityDistinct(int(dts['Value']), dts['Column_Name']) if (dts['Privacy_Model'] == 'LDiversity') else TClosenessEqualDistance(float(dts['Value']), dts['Column_Name']) if (dts['Privacy_Model'] == 'TCloseness') else None
+            if (t_anon is not None):
+                arr_anon.append(t_anon)
 
-    # get the risk profile for the new dataset
-    anon_risk_profile = anonymize_result.risk_profile
+        dt_column_names = list(map(lambda x: x['Column_Name'], args['data_transformation']))
+        pm_column_names = list(map(lambda x: x['Column_Name'], args['privacy_model']))
 
-    # get risk metrics as a dictionary
-    a_re_indentification_risk = anon_risk_profile.re_identification_risk
-    a_rp_attacker_success_rate = anon_risk_profile.attacker_success_rate
-    a_distribution_of_risk = anon_risk_profile.distribution_of_risk
+        for ind, dts in enumerate(data.columns):
+            if (dts not in dt_column_names and dts not in pm_column_names):
+                no_config_redaction_based = RedactionHierarchyBuilder()
+                redaction_hierarchy = arxaas.hierarchy(no_config_redaction_based, data[dts].tolist())
+                dataset.set_hierarchy(dts, redaction_hierarchy)
 
-    # get risk metrivs as pandas.DataFrame
-    re_i_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
-    dist_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
+        # anonymize data
+        anonymize_result = arxaas.anonymize(dataset, arr_anon)
 
-    # get the anonymiztion metrics
-    anon_metrics = anonymize_result.anonymization_metrics
+        # get the new dataset
+        anonymized_dataset = anonymize_result.dataset
+        anon_dataframe = anonymized_dataset.to_dataframe()
+        session['annonymized_file_data'] = anon_dataframe
+        session['annonymized_file_data_html'] = anon_dataframe.to_html()
+        session['annonymized_file_data_json'] = anon_dataframe.to_json(force_ascii=False)
 
-    print(args)
-    return jsonify({
-        'status': 'success',
-        'non_anonymized': {
-            'indentification_risk': na_re_indentification_risk,
-            'attacker_success_rate': na_rp_attacker_success_rate,
-            'distribution_of_risk': na_distribution_of_risk
-        },
-        'anonymized': {
-            'indentification_risk': a_re_indentification_risk,
-            'attacker_success_rate': a_rp_attacker_success_rate,
-            'distribution_of_risk': a_distribution_of_risk
-        }
-    })
+        # get the risk profile for the new dataset
+        anon_risk_profile = anonymize_result.risk_profile
+
+        # get risk metrics as a dictionary
+        a_re_indentification_risk = anon_risk_profile.re_identification_risk
+        a_rp_attacker_success_rate = anon_risk_profile.attacker_success_rate
+        a_distribution_of_risk = anon_risk_profile.distribution_of_risk
+
+        # get risk metrivs as pandas.DataFrame
+        re_i_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
+        dist_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
+
+        # get the anonymiztion metrics
+        anon_metrics = anonymize_result.anonymization_metrics
+
+        return jsonify({
+            'status': 'success',
+            'anonymized_data': anon_dataframe.to_html(),
+            'analyze_risk': {
+                'non_anonymized': {
+                    'indentification_risk': na_re_indentification_risk,
+                    'attacker_success_rate': na_rp_attacker_success_rate,
+                    'distribution_of_risk': na_distribution_of_risk
+                },
+                'anonymized': {
+                    'indentification_risk': a_re_indentification_risk,
+                    'attacker_success_rate': a_rp_attacker_success_rate,
+                    'distribution_of_risk': a_distribution_of_risk
+                }
+            }
+        })
+    except Exception as err:
+        return jsonify({
+            'status': 'fail',
+            'message': err.args[0]
+        })
 
