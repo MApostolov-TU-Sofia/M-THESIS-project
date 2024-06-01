@@ -189,7 +189,82 @@
         <div class="card card-body" style="background-color: #F5F7FF;">
             <div class="row mt-4">
                 <div class="col-12 text-center">
-                    <label>Analyze Risk</label>
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Non Anonymized Data</h4>
+                                    <canvas id="non_anonymized_chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Indentification risk</h4>
+                                    <table name="nonann_indentification_risk" class="table table-sm table-hover text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>Risk Type</th>
+                                                <th>Risk Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Risk Intervals</h4>
+                                    <table name="nonann_risk_intervals" class="table table-sm table-hover text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>Interval</th>
+                                                <th>Records With Maximal Risk</th>
+                                                <th>Records With Risk</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Anonymized Data</h4>
+                                    <canvas id="anonymized_chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Indentification risk</h4>
+                                    <table name="ann_indentification_risk" class="table table-sm table-hover text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>Risk Type</th>
+                                                <th>Risk Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="card-title">Risk Intervals</h4>
+                                    <table name="ann_risk_intervals" class="table table-sm table-hover text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>Interval</th>
+                                                <th>Records With Maximal Risk</th>
+                                                <th>Records With Risk</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

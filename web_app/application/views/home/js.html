@@ -150,6 +150,73 @@
         return data;
     };
 
+    const drawChart = (i_data, el_id, el_ir_tbl, el_ri_tbl) => {
+        const iLabels = Object.keys(i_data.attacker_success_rate);
+        const iValues = Array.from(Object.values(i_data.attacker_success_rate)).map(obj => Number(obj) * 100.0);
+        const iDatasets = [{
+            label: [el_id],
+            data: iValues,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(54, 162, 235, 0.2)'
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+                'rgb(54, 162, 235)'
+            ],
+            borderWidth: 1
+        }];
+
+        const graphCanvas = document.querySelector(el_id).getContext('2d');
+        const graphChart = new Chart(graphCanvas, {
+            type: 'bar',
+            data: {
+                labels: iLabels,
+                datasets: iDatasets
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        stacked: true,
+                        ticks: {
+                            min: 0,
+                            max: 100,
+                            callback: (value, index, ticks) => {
+                                return `${value}%`;
+                            }
+                        }
+                    }]
+                }
+            }
+        });
+
+        const iIRLabels = Object.keys(i_data.indentification_risk);
+        document.querySelector(`[name="${el_ir_tbl}"] tbody`).innerHTML = Array.from(iIRLabels)
+            .map((obj, ind, arr) => {
+                return `<tr>
+    <td>${obj}</td>
+    <td>${Number(i_data.indentification_risk[obj]) * 100.0} %</td>
+</tr>`;
+            })
+            .join('');
+            
+        if (i_data.distribution_of_risk.riskIntervalList.length > 0) {
+            const iRILabels = Object.keys(i_data.distribution_of_risk.riskIntervalList[0]);
+            document.querySelector(`[name="${el_ri_tbl}"] tbody`).innerHTML = Array.from(i_data.distribution_of_risk.riskIntervalList)
+                .map((obj, ind, arr) => {
+                    return `<tr>
+        <td>${obj[iRILabels[0]]}</td>
+        <td>${Number(obj[iRILabels[1]]) * 100.0} %</td>
+        <td>${Number(obj[iRILabels[2]]) * 100.0} %</td>
+    </tr>`;
+                })
+                .join('');
+        }
+    };
+
     const reDrawLayout = (resp) => {
         console.log(resp);
         document.querySelector('[name="collapse_window"] button[attr-id="#anonymized_data"]').classList.remove('disabled');
@@ -160,6 +227,9 @@
         document.querySelector('[name="load_anonymized_table"] table').classList.add('table');
         document.querySelector('[name="load_anonymized_table"] table').classList.add('table-sm');
         document.querySelector('[name="load_anonymized_table"] table').classList.add('table-hover');
+
+        drawChart(resp.analyze_risk.non_anonymized, '#non_anonymized_chart', 'nonann_indentification_risk', 'nonann_risk_intervals');
+        drawChart(resp.analyze_risk.anonymized, '#anonymized_chart', 'ann_indentification_risk', 'ann_risk_intervals');
     };
 
     const anonymizeData = (el) => {
