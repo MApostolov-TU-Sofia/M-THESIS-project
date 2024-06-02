@@ -8,13 +8,14 @@ def user_check_index():
     c_user_info = session['user']
     if (c_user_info is not None):
         user_email = c_user_info.get("email") if (c_user_info.get("email") is not None) else None
-        user_email = c_user_info.get("preferred_username") if (user_email is None and c_user_info.get("preferred_username") is not None) else None
+        user_email = c_user_info.get("preferred_username") if (user_email is None and c_user_info.get("preferred_username") is not None) else user_email
 
         user_type = 'google' if (c_user_info.get("iss") is not None and 'google' in c_user_info.get("iss")) else None
         user_type = 'microsoft' if (c_user_info.get("iss") is not None and 'microsoft' in c_user_info.get("iss")) else user_type
         user_type = 'std' if (user_type is None) else user_type
 
         user_name = c_user_info.get('name') if (c_user_info.get("iss") is not None and 'microsoft' in c_user_info.get("iss")) else None
+        user_name = c_user_info.get('name') if (c_user_info.get("iss") is not None and 'google' in c_user_info.get("iss")) else user_name
 
         if (user_email is not None):
             db_user_check = user_db.User.query.filter_by(username=user_email).first()

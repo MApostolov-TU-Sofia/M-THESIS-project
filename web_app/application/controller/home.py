@@ -4,7 +4,9 @@ from application import app
 from application.controller.user import user_check_index
 
 
-def home_index():
+def home_index(templ_html):
+    reg_usr = '/user/register'
+    log_usr = '/user/login'
     lg_ms = '/user/login/microsoft'
     lg_google = '/user/login/google'
     lg_logout = '/user/logout'
@@ -13,7 +15,9 @@ def home_index():
     session['user'] = lg_user
     if (lg_user is not None):
         user_check_index()
-    return render_template('home/index.html',
+    return render_template(templ_html,
+                           register_account=reg_usr,
+                           login_account=log_usr,
                            login_microsoft=lg_ms,
                            login_google=lg_google,
                            logout=lg_logout,

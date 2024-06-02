@@ -6,7 +6,7 @@ from application.controller.home import home_index, page_not_found_index
 
 @app.route('/')
 def home_route():
-    return home_index()
+    return home_index('home/index.html')
 
 
 @app.errorhandler(404)

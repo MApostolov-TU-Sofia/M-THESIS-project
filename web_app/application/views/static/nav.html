@@ -32,18 +32,20 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
           {% if session.get('user') %}
-          <a class="dropdown-item" href="{{ view_profile }}">
-            <i class="ti-settings text-primary"></i>
-            Profile
-          </a>
+            {% if session.get('user').get('logged_in_usertype') %}
+            <a class="dropdown-item" href="{{ view_profile }}">
+              <i class="ti-settings text-primary"></i>
+              Profile
+            </a>
+            {% endif %}
           <a class="dropdown-item" href="{{ logout }}">
             <i class="ti-power-off text-primary"></i>
             Logout
           </a>
           {% else %}
-            <a class="dropdown-item" href="{{ register_account }}">
+            <a class="dropdown-item" href="{{ login_account }}">
               <i class="ti-user text-primary"></i>
-              Register Account
+              Login Account
             </a>
             <a class="dropdown-item" href="{{ login_microsoft }}">
               <i class="ti-microsoft-alt text-primary"></i>
@@ -52,6 +54,10 @@
             <a class="dropdown-item" href="{{ login_google }}">
               <i class="ti-google text-primary"></i>
               Login with Google
+            </a>
+            <a class="dropdown-item" href="{{ register_account }}">
+              <i class="ti-user text-primary"></i>
+              Register Account
             </a>
           {% endif %}
         </div>
