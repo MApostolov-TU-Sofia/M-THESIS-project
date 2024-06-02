@@ -10,6 +10,7 @@ def home_index(templ_html):
     lg_ms = '/user/login/microsoft'
     lg_google = '/user/login/google'
     lg_logout = '/user/logout'
+    lg_profile = '/user/profile'
     lg_user = session['user'] if session.get('user') else None
     lg_user = session['_logged_in_user'] if (lg_user is None and session.get('_logged_in_user')) else lg_user
     session['user'] = lg_user
@@ -21,6 +22,7 @@ def home_index(templ_html):
                            login_microsoft=lg_ms,
                            login_google=lg_google,
                            logout=lg_logout,
+                           account_profile=lg_profile,
                            user=lg_user)
 
 

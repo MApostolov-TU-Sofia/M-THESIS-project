@@ -33,7 +33,7 @@
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
           {% if session.get('user') %}
             {% if session.get('user').get('logged_in_usertype') %}
-            <a class="dropdown-item" href="{{ view_profile }}">
+            <a class="dropdown-item" href="{{ account_profile }}">
               <i class="ti-settings text-primary"></i>
               Profile
             </a>

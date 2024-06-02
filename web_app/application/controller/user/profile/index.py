@@ -7,8 +7,43 @@ from application.model import user as user_db
 from application import app, db
 
 
-def user_login_profile_index():
-    return "Welcome to Route profile NEW!"
+def user_profile(request, args):
+    if (not session['user']):
+        return redirect('/')
+    else:
+        if (request.method == 'GET'):
+            return home.home_index('/user/profile.html')
+
+
+def user_change_password(request, args):
+    responseJSON = {
+        'status': None,
+        'message': None,
+        'username': None,
+        'token': None
+    }
+    db_user_check = user_db.User.query.filter_by(username=session.get('user').get("username")).first()
+    if (db_user_check is not None):
+        hashedPass = swiftcrypt.Hash().hash_password(args.get("old_password"), db_user_check.salt, 'sha512')
+        if (hashedPass == db_user_check.password):
+            if (args.get("new_password") == args.get("repeat_new_password")):
+                new_hashed_pass = swiftcrypt.Hash().hash_password(args.get("new_password"), db_user_check.salt, 'sha512')
+
+                db_user_check.password = new_hashed_pass
+                db.session.commit()
+                responseJSON['status'] = 'success'
+                responseJSON['message'] = 'Successful password update'
+            else:
+                responseJSON['status'] = 'fail'
+                responseJSON['message'] = 'New passwords do not match'
+        else:
+            responseJSON['status'] = 'fail'
+            responseJSON['message'] = 'Original password does not match'
+    else:
+        responseJSON['status'] = 'fail'
+        responseJSON['message'] = 'User already exists'
+
+    return jsonify(responseJSON)
 
 
 def user_register(request, args):

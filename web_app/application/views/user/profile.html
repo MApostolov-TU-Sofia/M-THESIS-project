@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block page_title %}Profile{% endblock %}
+{% block content %}
+<div class="col-12 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Change Password</h4>
+      <div class="forms-sample" name="change_password">
+        <div class="form-group">
+          <label for="old_password">Old Password</label>
+          <input type="password" class="form-control form-control-sm" name="old_password" placeholder="Old Password">
+        </div>
+        <div class="form-group">
+          <label for="new_password">New Password</label>
+          <input type="password" class="form-control form-control-sm" name="new_password" placeholder="New Password">
+        </div>
+        <div class="form-group">
+          <label for="repeat_new_password">Old Password</label>
+          <input type="password" class="form-control form-control-sm" name="repeat_new_password" placeholder="Repeat New Password">
+        </div>
+        <button class="btn btn-primary btn-sm form-control form-control-sm mr-2" onclick="userSubmit(this);">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    const userSubmit = (el) => {
+        const cModel = document.querySelector('[name="change_password"]');
+        const columnsData = {
+            old_password: cModel.querySelector('[name="old_password"]').value,
+            new_password: cModel.querySelector('[name="new_password"]').value,
+            repeat_new_password: cModel.querySelector('[name="repeat_new_password"]').value
+        };
+        fetch('/user/change_password', {
+            method: "POST",
+            body: JSON.stringify(columnsData),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((json) => {
+            document.querySelector(`#${json.status} .toast-body`).innerHTML = json.message ? json.message : json.status;
+            document.querySelector(`#${json.status}`).classList.remove('d-none');
+        });
+    }
+</script>
+{% endblock %}
