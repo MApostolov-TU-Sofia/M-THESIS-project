@@ -115,3 +115,36 @@ def project_modify(request, args):
             'status': 'success',
             'project_id': db_project_extr.id
         })
+
+
+def project_delete(request, args):
+    c_username = session['user_email'] if 'user_email' in session else None
+
+    if (c_username is None):
+        return jsonify({
+            'status': 'fail',
+            'message': 'No logged in user. Please login again'
+        })
+    else:
+        c_project_id = args.get('project_id')
+        db_user_check = user_db.User.query.filter_by(username=c_username).first()
+        db_project_extr = project_db.Project.query.filter_by(id=c_project_id, user_id=db_user_check.id).first()
+        if (db_project_extr is None):
+            return jsonify({
+                'status': 'fail',
+                'message': 'Not equal creation user to project'
+            })
+        else:
+            for d_obj in db_project_extr.project_privacy_models:
+                db.session.delete(d_obj)
+            for d_obj in db_project_extr.project_data_transformations:
+                db.session.delete(d_obj)
+            for d_obj in db_project_extr.project_tables:
+                db.session.delete(d_obj)
+            db.session.delete(db_project_extr)
+            db.session.commit()
+            return jsonify({
+                'status': 'success',
+                'message': 'Project is deleted'
+            })
+

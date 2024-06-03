@@ -257,14 +257,21 @@
                 return response.json();
             })
             .then((json) => {
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
                 if (json.status == 'success') {
                     reDrawLayout(json);
                 }
                 document.querySelector(`#${json.status} .toast-body`).innerHTML = json.message ? JSON.parse(json.message).message : json.status;
                 document.querySelector(`#${json.status}`).classList.remove('d-none');
+            })
+            .catch((err) => {
                 el.innerHTML = bText;
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
+                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail`).classList.remove('d-none');
             });
         } else {
             let iText = columnsData.data_transformation.length == 0 ? 'At least one Transformation Type and Hierarchy must be specified!<br/>' : '';
@@ -305,21 +312,32 @@
                 return response.json();
             })
             .then((json) => {
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
                 if (json.status == 'success') {
                     cModel.querySelector('[name="project_id"]').value = json.project_id;
+                    if (!projectId) {
+                        el.parentElement.innerHTML = `<div class="col-6">
+    <button class="btn btn-warning btn-sm btn-block" onclick="saveProjectData(this);">UPDATE</button>
+</div>
+<div class="col-6">
+    <button class="btn btn-danger btn-sm btn-block" onclick="deleteProjectData(this, ${json.project_id} }});">DELETE</button>
+</div>`;
+                        document.querySelector('#ui-basic ul').innerHTML += `<li class="nav-item">
+    <a class="nav-link" href="/${json.project_id}">${projectName}</a>
+</li>`;
+                    }
                 }
                 document.querySelector(`#${json.status} .toast-body`).innerHTML = json.status;
                 document.querySelector(`#${json.status}`).classList.remove('d-none');
-                el.innerHTML = bText;
-                el.classList.remove('disabled');
-                el.removeAttribute('disabled');
             })
             .catch((err) => {
-                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
-                document.querySelector(`#fail`).classList.remove('d-none');
                 el.innerHTML = bText;
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
+                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail`).classList.remove('d-none');
             });
         } else {
             let iText = columnsData.data_transformation.length == 0 ? 'At least one Transformation Type and Hierarchy must be specified!<br/>' : '';
@@ -327,6 +345,49 @@
             iText += !projectName ? 'Add a project name<br/>' : ''; 
             document.querySelector(`#fail .toast-body`).innerHTML = iText;
             document.querySelector(`#fail`).classList.remove('d-none');
+        }
+    };
+
+    const deleteProjectData = (el, p_id) => {
+        if (confirm(`Do you agree to delete ${p_id}?`)) {
+            const cModel = document.querySelector('[name="project_name"]');
+            const bText = el.innerHTML;
+            el.innerHTML = `<div class="spinner-border spinner-border-sm text-light"></div>`;
+            el.classList.add('disabled');
+            el.setAttribute('disabled', '');
+            fetch('/project/delete', {
+                method: "POST",
+                body: JSON.stringify({
+                    project_id: p_id,
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
+
+                if (json.status == 'success') {
+                    cModel.querySelector('[name="project_id"]').value = null;
+                    el.parentElement.parentElement.innerHTML = '<button class="btn btn-info btn-sm btn-block col-12" onclick="saveProjectData(this);">CREATE</button>';
+                    document.querySelector(`#ui-basic a[href="/${p_id}"]`).parentElement.remove();
+                }
+                document.querySelector(`#${json.status} .toast-body`).innerHTML = json.status;
+                document.querySelector(`#${json.status}`).classList.remove('d-none');
+            })
+            .catch((err) => {
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
+
+                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail`).classList.remove('d-none');
+            });
         }
     };
 </script>
