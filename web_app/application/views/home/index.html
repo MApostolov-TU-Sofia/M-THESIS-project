@@ -49,6 +49,7 @@
                         </div>
                         <div class="col-12">
                             <form action="/data/upload_excel" method="POST" enctype="multipart/form-data" class="row">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <div class="col-md-10 col-sm-12">
                                     <input type="file" name="file" class="file-upload-default w-100 border"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">

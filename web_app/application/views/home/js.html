@@ -250,7 +250,8 @@
                 method: "POST",
                 body: JSON.stringify(columnsData),
                 headers: {
-                    'Content-type': 'application/json; charset=UTF-8'
+                    'Content-type': 'application/json; charset=UTF-8',
+                    'X-CSRFToken': '{{ csrf_token() }}'
                 }
             })
             .then((response) => {
@@ -305,7 +306,8 @@
                     transformation_data: columnsData
                 }),
                 headers: {
-                    'Content-type': 'application/json; charset=UTF-8'
+                    'Content-type': 'application/json; charset=UTF-8',
+                    'X-CSRFToken': '{{ csrf_token() }}'
                 }
             })
             .then((response) => {
@@ -361,7 +363,8 @@
                     project_id: p_id,
                 }),
                 headers: {
-                    'Content-type': 'application/json; charset=UTF-8'
+                    'Content-type': 'application/json; charset=UTF-8',
+                    'X-CSRFToken': '{{ csrf_token() }}'
                 }
             })
             .then((response) => {

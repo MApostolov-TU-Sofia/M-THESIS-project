@@ -12,7 +12,7 @@ def user_profile(request, args):
         return redirect('/')
     else:
         if (request.method == 'GET'):
-            return home.home_index('/user/profile.html')
+            return home.home_index('/user/profile.html', None)
 
 
 def user_change_password(request, args):
@@ -57,7 +57,7 @@ def user_register(request, args):
             'token': None
         }
         if (request.method == 'GET'):
-            return home.home_index('user/register.html')
+            return home.home_index('user/register.html', None)
         if (request.method == 'POST'):
             db_user_check = user_db.User.query.filter_by(username=args.get('username')).first()
             if (db_user_check is None):
@@ -113,7 +113,7 @@ def user_login(request, args):
             'token': None
         }
         if (request.method == 'GET'):
-            return home.home_index('user/login.html')
+            return home.home_index('user/login.html', None)
         if (request.method == 'POST'):
             db_user_check = user_db.User.query.filter_by(username=args.get("username")).first()
             if (db_user_check is not None):

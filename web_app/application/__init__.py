@@ -6,6 +6,7 @@ from flask import Flask, render_template
 from ms_identity_python.flask import Auth
 from authlib.integrations.flask_client import OAuth
 from config import Config
+from flask_wtf.csrf import CSRFProtect
 
 DATABASE_URL = 'mysql+mysqlconnector://tu_user:tu_sofia_psw@localhost:3306/tu_sofia_anonymize_app'
 
@@ -13,6 +14,7 @@ app = Flask(__name__, template_folder='views', static_folder='public')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config.from_object(Config)
+csrf = CSRFProtect(app)
 db = SQLAlchemy(app)
 
 ms_auth = Auth(
