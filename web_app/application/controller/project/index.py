@@ -51,7 +51,7 @@ def project_modify(request, args):
         if (len(project_table_db_extr) > 0):
             for d_obj in project_table_db_extr:
                 db.session.delete(d_obj)
-        p_table = json.loads(session['uploaded_file_data'].to_json())
+        p_table = json.loads(session['uploaded_file_data'].to_json(force_ascii=False))
         for i, obj in enumerate(p_table):
             for ind in p_table[obj]:
                 project_table_db_extr = None

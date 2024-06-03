@@ -3,12 +3,16 @@
 {% block content %}
 {% if session.get('user') and session.get('uploaded_file_data_html') %}
 <div class="row mb-4" name="project_name">
-    <input type="hidden" name="project_id" />
+    <input type="hidden" name="project_id" {% if session.get('view_project') %}value="{{ session.get('view_project').id }}"{% endif %} />
     <div class="col-10">
-        <input type="text" class="form-control form-control-sm" name="i_project_name" placeholder="Project Name">
+        <input type="text" class="form-control form-control-sm" name="i_project_name" placeholder="Project Name" {% if session.get('view_project') %}value="{{ session.get('view_project').name }}"{% endif %}>
     </div>
     <div class="col-2">
+        {% if session.get('view_project') %}
+        <button class="btn btn-warning btn-sm btn-block" onclick="saveProjectData(this);">UPDATE</button>
+        {% else %}
         <button class="btn btn-info btn-sm btn-block" onclick="saveProjectData(this);">SAVE</button>
+        {% endif %}
     </div>
 </div>
 {% endif %}
@@ -133,6 +137,20 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    {% if session.get('view_project') %}
+                                                        {% for prj in session.get('view_project').project_data_transformations %}
+                                                        <tr>
+                                                            <td>{{ prj.column_name }}</td>
+                                                            <td>{{ prj.column_type }}</td>
+                                                            <td>{{ prj.transformation_type }}</td>
+                                                            <td>{{ prj.hierarchy_type }}</td>
+                                                            <td>{{ prj.hierarchy_symbols }}</td>
+                                                            <td>
+                                                                <button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% endif %}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -170,6 +188,19 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    {% if session.get('view_project') %}
+                                                        {% for prj in session.get('view_project').project_privacy_models %}
+                                                        <tr>
+                                                            <td>{{ prj.column_name }}</td>
+                                                            <td>{{ prj.column_type }}</td>
+                                                            <td>{{ prj.column_privacy_model }}</td>
+                                                            <td>{{ prj.column_value }}</td>
+                                                            <td>
+                                                                <button class="btn btn-danger btn-sm btn-block" onclick="this.parentElement.parentElement.remove();">X</button>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% endif %}
                                                 </tbody>
                                             </table>
                                         </div>

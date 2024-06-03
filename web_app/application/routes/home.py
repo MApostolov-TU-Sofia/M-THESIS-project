@@ -4,9 +4,10 @@ from application import app
 from application.controller.home import home_index, page_not_found_index
 
 
-@app.route('/')
-def home_route():
-    return home_index('home/index.html')
+@app.route('/', defaults={'project_id': None})
+@app.route('/<project_id>')
+def home_route(project_id):
+    return home_index('home/index.html', project_id)
 
 
 @app.errorhandler(404)

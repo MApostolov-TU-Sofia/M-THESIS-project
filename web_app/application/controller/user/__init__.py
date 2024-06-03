@@ -35,3 +35,5 @@ def user_check_index():
                 db.session.add(new_record)
                 db.session.commit()
                 print(user_email + ' added')
+
+            session['my_projects'] = db_user_check.projects
