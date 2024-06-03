@@ -9,7 +9,7 @@ class ProjectPrivacyModel(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('at_projects.id'), nullable=True)
     column_name = db.Column(db.String(256), nullable=False)
     column_type = db.Column(db.String(32), nullable=False)
-    privacy_model = db.Column(db.String(32), nullable=False)
+    column_privacy_model = db.Column(db.String(32), nullable=False)
     column_value = db.Column(db.String(32), nullable=False)
     updated_at = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.Date, nullable=False)

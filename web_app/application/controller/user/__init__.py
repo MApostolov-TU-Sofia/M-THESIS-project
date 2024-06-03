@@ -17,6 +17,7 @@ def user_check_index():
         user_name = c_user_info.get('name') if (c_user_info.get("iss") is not None and 'microsoft' in c_user_info.get("iss")) else None
         user_name = c_user_info.get('name') if (c_user_info.get("iss") is not None and 'google' in c_user_info.get("iss")) else user_name
 
+        session['user_email'] = user_email
         if (user_email is not None):
             db_user_check = user_db.User.query.filter_by(username=user_email).first()
             if (not db_user_check):

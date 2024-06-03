@@ -7,6 +7,7 @@ class ProjectTable(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('at_projects.id'), nullable=True)
+    row_index = db.Column(db.Integer, nullable=False)
     column_type = db.Column(db.String(32), nullable=False)
     column_name = db.Column(db.String(256), nullable=False)
     column_value = db.Column(db.String(256), nullable=True)

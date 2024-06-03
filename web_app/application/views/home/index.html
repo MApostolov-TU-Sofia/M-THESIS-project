@@ -1,6 +1,17 @@
 {% extends "layout.html" %}
 {% block page_title %}Home{% endblock %}
 {% block content %}
+{% if session.get('user') and session.get('uploaded_file_data_html') %}
+<div class="row mb-4" name="project_name">
+    <input type="hidden" name="project_id" />
+    <div class="col-10">
+        <input type="text" class="form-control form-control-sm" name="i_project_name" placeholder="Project Name">
+    </div>
+    <div class="col-2">
+        <button class="btn btn-info btn-sm btn-block" onclick="saveProjectData(this);">SAVE</button>
+    </div>
+</div>
+{% endif %}
 <div class="row" name="collapse_window">
     <div class="col-12">
         <p>

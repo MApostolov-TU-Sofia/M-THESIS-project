@@ -232,11 +232,15 @@
         drawChart(resp.analyze_risk.anonymized, '#anonymized_chart', 'ann_indentification_risk', 'ann_risk_intervals');
     };
 
-    const anonymizeData = (el) => {
-        const columnsData = {
+    const extractDataForAnonymization = () => {
+        return {
             'data_transformation': tableToJson(document.querySelector('table[name="data_transformation_details"]')),
             'privacy_model': tableToJson(document.querySelector('table[name="privacy_model_details"]')),
-        }
+        };
+    };
+
+    const anonymizeData = (el) => {
+        const columnsData = extractDataForAnonymization();
         if (columnsData.data_transformation.length > 0 && columnsData.privacy_model.length > 0) {
             const bText = el.innerHTML;
             el.innerHTML = `<div class="spinner-border spinner-border-sm text-light"></div>`;
@@ -273,5 +277,56 @@
     const exportAnnonymizedData = (el) => {
         const table2excel = new Table2Excel();
         table2excel.export(document.querySelector('[name="load_anonymized_table"] table'), 'annonymized_data');
+    };
+
+    const saveProjectData = (el) => {
+        const cModel = document.querySelector('[name="project_name"]');
+        const projectId = cModel.querySelector('[name="project_id"]').value;
+        const projectName = cModel.querySelector('[name="i_project_name"]').value;
+        const columnsData = extractDataForAnonymization();
+        if (columnsData.data_transformation.length > 0 && columnsData.privacy_model.length > 0 && projectName) {
+            const bText = el.innerHTML;
+            el.innerHTML = `<div class="spinner-border spinner-border-sm text-light"></div>`;
+            el.classList.add('disabled');
+            el.setAttribute('disabled', '');
+
+            fetch('/project/modify', {
+                method: "POST",
+                body: JSON.stringify({
+                    project_id: projectId,
+                    project_name: projectName,
+                    transformation_data: columnsData
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                if (json.status == 'success') {
+                    cModel.querySelector('[name="project_id"]').value = json.project_id;
+                }
+                document.querySelector(`#${json.status} .toast-body`).innerHTML = json.status;
+                document.querySelector(`#${json.status}`).classList.remove('d-none');
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
+            })
+            .catch((err) => {
+                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail`).classList.remove('d-none');
+                el.innerHTML = bText;
+                el.classList.remove('disabled');
+                el.removeAttribute('disabled');
+            });
+        } else {
+            let iText = columnsData.data_transformation.length == 0 ? 'At least one Transformation Type and Hierarchy must be specified!<br/>' : '';
+            iText += columnsData.privacy_model.length == 0 ? 'At least one privacy model must be specified!<br/>' : '';
+            iText += !projectName ? 'Add a project name<br/>' : ''; 
+            document.querySelector(`#fail .toast-body`).innerHTML = iText;
+            document.querySelector(`#fail`).classList.remove('d-none');
+        }
     };
 </script>

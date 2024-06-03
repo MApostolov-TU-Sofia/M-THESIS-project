@@ -55,7 +55,7 @@ from application.controller import home
 # import app09.application.routes.transaction
 
 
-from .routes import home, user, data
+from .routes import home, user, data, project
 
 with app.app_context():
     db.create_all()

@@ -59,7 +59,7 @@ def user_register(request, args):
         if (request.method == 'GET'):
             return home.home_index('user/register.html')
         if (request.method == 'POST'):
-            db_user_check = user_db.User.query.filter_by(username=args.get("username")).first()
+            db_user_check = user_db.User.query.filter_by(username=args.get('username')).first()
             if (db_user_check is None):
                 password = args.get('password')
                 repeat_password = args.get('repeat_password')
@@ -69,7 +69,7 @@ def user_register(request, args):
 
                     new_record = user_db.User()
                     new_record.login_type = 'user'
-                    new_record.username = args.get("username")
+                    new_record.username = args.get('username')
                     new_record.password = hashedPass
                     new_record.salt = salt
                     new_record.role = 'STD'
@@ -87,6 +87,7 @@ def user_register(request, args):
                         'logged_in_usertype': 'std_user'
                     }
                     session['user'] = user_info
+                    session['user_email'] = args.get("username")
                     responseJSON['status'] = 'success'
                 else:
                     responseJSON['status'] = 'fail'
@@ -125,6 +126,7 @@ def user_login(request, args):
                         'logged_in_usertype': 'std_user'
                     }
                     session['user'] = user_info
+                    session['user_email'] = db_user_check.username
                 else:
                     responseJSON['status'] = 'fail'
                     responseJSON['message'] = 'Passwords do not match'
