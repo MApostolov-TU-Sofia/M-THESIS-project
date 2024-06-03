@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from application import app, db
 
+
 class User(db.Model):
     __tablename__ = 'at_users'
 
@@ -14,6 +15,7 @@ class User(db.Model):
     address = db.Column(db.String(256), nullable=True)
     phone_nbr = db.Column(db.String(32), nullable=True)
     created_at = db.Column(db.Date, nullable=True)
+    projects = db.relationship('Project')
 
     @property
     def serialize(self):
@@ -27,5 +29,6 @@ class User(db.Model):
             'name': self.name,
             'address': self.address,
             'phone_nbr': self.phone_nbr,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'projects': self.projects
         }
