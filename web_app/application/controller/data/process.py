@@ -115,10 +115,12 @@ def anonymize_data(args):
                     'attacker_success_rate': a_rp_attacker_success_rate,
                     'distribution_of_risk': a_distribution_of_risk
                 }
-            }
+            },
+            'csrf': session['csrf_token']
         })
     except Exception as err:
         return jsonify({
             'status': 'fail',
-            'message': str(err.args)
+            'message': str(err.args),
+            'csrf': session['csrf_token']
         })

@@ -257,22 +257,17 @@
             .then((response) => {
                 return response.json();
             })
-            .then((json) => {
+            .then((json, err) => {
                 el.innerHTML = bText;
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
-                if (json.status == 'success') {
-                    reDrawLayout(json);
+                if (json) {
+                    if (json.status == 'success') {
+                        reDrawLayout(json);
+                    }
+                    document.querySelector(`#${json.status} .toast-body`).innerText = json.message ? json.message : json.status;
+                    document.querySelector(`#${json.status}`).classList.remove('d-none');
                 }
-                document.querySelector(`#${json.status} .toast-body`).innerHTML = json.message ? JSON.parse(json.message).message : json.status;
-                document.querySelector(`#${json.status}`).classList.remove('d-none');
-            })
-            .catch((err) => {
-                el.innerHTML = bText;
-                el.classList.remove('disabled');
-                el.removeAttribute('disabled');
-                document.querySelector(`#fail .toast-body`).innerText = err.message ? err.message : 'Error!';
-                document.querySelector(`#fail`).classList.remove('d-none');
             });
         } else {
             let iText = columnsData.data_transformation.length == 0 ? 'At least one Transformation Type and Hierarchy must be specified!<br/>' : '';

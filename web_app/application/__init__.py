@@ -11,7 +11,7 @@ app = Flask(__name__, template_folder='views', static_folder='public')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config.from_object(Config)
-csrf = CSRFProtect(app)
+csrf = CSRFProtect()
 db = SQLAlchemy(app)
 
 ms_auth = Auth(
@@ -42,3 +42,4 @@ from application.routes import home, user, data, project
 
 with app.app_context():
     db.create_all()
+    csrf.init_app(app)
