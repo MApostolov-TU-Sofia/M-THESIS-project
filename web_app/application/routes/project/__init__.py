@@ -1,4 +1,3 @@
-from flask import Blueprint
 from app import app
 
 # Importing sub-route blueprints

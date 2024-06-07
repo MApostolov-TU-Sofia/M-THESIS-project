@@ -1,10 +1,5 @@
 from flask import Blueprint, session, request
 from application.controller.data.process import data_upload_excel, anonymize_data
-import os
-import requests
-from flask import Flask, render_template
-from ms_identity_python.flask import Auth
-from application import app, ms_auth
 from application import routes
 
 route_data_process_bp = Blueprint('route_data_process_bp', __name__)

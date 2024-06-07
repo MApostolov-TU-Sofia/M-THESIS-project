@@ -1,9 +1,6 @@
 from flask import Blueprint, session
 from application.controller.user.login.microsoft import user_login_microsoft_index, user_login_microsoft_call_api
 import os
-import requests
-from flask import Flask, render_template
-from ms_identity_python.flask import Auth
 from application import app, ms_auth
 
 route_user_microsoft_bp = Blueprint('route_microsoft', __name__)

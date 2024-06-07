@@ -271,7 +271,7 @@
                 el.innerHTML = bText;
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
-                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail .toast-body`).innerText = err.message ? err.message : 'Error!';
                 document.querySelector(`#fail`).classList.remove('d-none');
             });
         } else {
@@ -338,7 +338,7 @@
                 el.innerHTML = bText;
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
-                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail .toast-body`).innerText = err.message ? err.message : 'Error!';
                 document.querySelector(`#fail`).classList.remove('d-none');
             });
         } else {
@@ -388,7 +388,7 @@
                 el.classList.remove('disabled');
                 el.removeAttribute('disabled');
 
-                document.querySelector(`#fail .toast-body`).innerHTML = err.message ? err.message : 'Error!';
+                document.querySelector(`#fail .toast-body`).innerText = err.message ? err.message : 'Error!';
                 document.querySelector(`#fail`).classList.remove('d-none');
             });
         }

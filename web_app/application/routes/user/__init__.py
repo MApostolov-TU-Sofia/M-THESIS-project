@@ -1,5 +1,3 @@
-from flask import Blueprint
-
 # Importing sub-route blueprints
 from .login.microsoft import route_user_microsoft_bp
 from .login.google import route_user_google_bp

@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from application import app, db
 
 
@@ -26,5 +25,3 @@ class Project(db.Model):
             'project_data_transformations': self.project_data_transformations,
             'project_privacy_models': self.project_privacy_models
         }
-
-# db.Index('idx_apcts_name', Project.name)

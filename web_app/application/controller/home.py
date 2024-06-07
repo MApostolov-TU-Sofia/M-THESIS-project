@@ -1,8 +1,6 @@
 import pandas as pd
 import json
-from datetime import datetime
 from flask import render_template, jsonify, session, redirect
-from application import app
 from application.controller.user import user_check_index
 from application.model import project as project_db
 

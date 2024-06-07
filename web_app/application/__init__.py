@@ -1,7 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, Blueprint
-import os
-import requests
 from flask import Flask, render_template
 from ms_identity_python.flask import Auth
 from authlib.integrations.flask_client import OAuth
@@ -40,24 +37,8 @@ google_auth = google_oauth.register(
 )
 
 from application import model
-
 from application.controller import home
-# import app09.application.controller.role
-# import app09.application.controller.user
-# import app09.application.controller.bank
-# import app09.application.controller.bank_account
-# import app09.application.controller.credit_card
-# import app09.application.controller.transaction
-
-# import app09.application.routes.role
-# import app09.application.routes.user
-# import app09.application.routes.bank
-# import app09.application.routes.bank_account
-# import app09.application.routes.credit_card
-# import app09.application.routes.transaction
-
-
-from .routes import home, user, data, project
+from application.routes import home, user, data, project
 
 with app.app_context():
     db.create_all()

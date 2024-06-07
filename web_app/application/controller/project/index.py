@@ -1,9 +1,6 @@
 from datetime import datetime
 from flask import render_template, jsonify, session, redirect
-from swiftcrypt import swiftcrypt
 import json
-
-from application.controller import home, user
 from application.model import user as user_db,\
     project as project_db,\
     project_table as project_table_db,\
@@ -147,4 +144,3 @@ def project_delete(request, args):
                 'status': 'success',
                 'message': 'Project is deleted'
             })
-

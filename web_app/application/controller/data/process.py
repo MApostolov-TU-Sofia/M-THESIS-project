@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from flask import Flask, render_template, jsonify, request, redirect, session
-from fileinput import filename
 from pyarxaas import ARXaaS, AttributeType, Dataset
 from pyarxaas.privacy_models import KAnonymity, LDiversityDistinct, TClosenessEqualDistance
 from pyarxaas.hierarchy import IntervalHierarchyBuilder, OrderHierarchyBuilder, DateHierarchyBuilder, RedactionHierarchyBuilder
@@ -16,6 +15,7 @@ try:
     arxaas = ARXaaS(Config.APP_ARXaaS_URL)
 except Exception:
     print(Exception)
+
 
 def data_upload_excel():
     # Read the File using Flask request
@@ -120,6 +120,5 @@ def anonymize_data(args):
     except Exception as err:
         return jsonify({
             'status': 'fail',
-            'message': err.args[0]
+            'message': str(err.args)
         })
-
