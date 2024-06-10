@@ -94,11 +94,11 @@ def anonymize_data(args):
         a_rp_attacker_success_rate = anon_risk_profile.attacker_success_rate
         a_distribution_of_risk = anon_risk_profile.distribution_of_risk
 
-        # get risk metrivs as pandas.DataFrame
+        # get risk metrics as pandas.DataFrame
         re_i_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
         dist_risk_df = anon_risk_profile.distribution_of_risk_dataframe()
 
-        # get the anonymiztion metrics
+        # get the anonymization metrics
         anon_metrics = anonymize_result.anonymization_metrics
 
         return jsonify({
