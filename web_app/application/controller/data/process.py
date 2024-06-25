@@ -60,7 +60,7 @@ def anonymize_data(args):
                         if (len(i_dts.strip()) > 0):
                             i_dts_el = i_dts.split(',')
                             hierarchy_builder.add_interval(int(i_dts_el.get(0)), int(i_dts_el.get(1)), i_dts_el.get(2))
-                if (hierarchy_builder is not None):
+                if (hierarchy_builder is not None and dts['Transformation_Type'] == 'quasi_identifying'):
                     redaction_hierarchy = arxaas.hierarchy(hierarchy_builder, data[dts['Column_Name']].tolist())
                     dataset.set_hierarchy(dts['Column_Name'], redaction_hierarchy)
 

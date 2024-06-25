@@ -51,9 +51,9 @@
         let iHTML = ''
         if (el.getAttribute('attr-id') == 'data_transformation') {            
             if (privacyModelColumn && privacyModelType && privacyModelTransformationType) {
-                Array.from(cModel.querySelectorAll('table tbody tr'))
-                    .filter(obj => obj.children[0].innerText == privacyModelColumn)
-                    .forEach(obj => obj.remove());
+                // Array.from(cModel.querySelectorAll('table tbody tr'))
+                //     .filter(obj => obj.children[0].innerText == privacyModelColumn)
+                //     .forEach(obj => obj.remove());
                 iHTML = `<tr>
     <td>${privacyModelColumn}</td>
     <td>${privacyModelType}</td>
